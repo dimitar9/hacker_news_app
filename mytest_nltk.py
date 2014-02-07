@@ -1,6 +1,6 @@
 import nltk
 
-text = """The Stupidity of Computers """
+text = "The Stupidity of Computers"
 
 # Used when tokenizing words
 sentence_re = r'''(?x)      # set flag to allow verbose regexps
@@ -61,8 +61,11 @@ def get_terms(tree):
         yield term
 
 terms = get_terms(tree)
-
+result_list = []
 for term in terms:
     for word in term:
-        print word,
-    print
+        print word
+        result_list.append(word)
+
+print result_list[0]
+print result_list[1]
