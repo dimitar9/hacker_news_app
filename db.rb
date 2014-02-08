@@ -93,7 +93,7 @@ def main
 
 
     news_json["items"].each do |item|
-      p.addNews(item["id"], item["title"],item["url"],
+      p.addNews(item["id"], item["title"].encode('utf-8'),item["url"],
         item["points"], item["postedBy"],"","","",0, FALSE,Time.now.getutc)
     end
     p.queryNewsTable {|row| printf("id:%d title:%s submitter:%s\n", row['id'], row['title'],row['submitter'])}

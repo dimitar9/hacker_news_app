@@ -21,11 +21,11 @@ try:
         keywords = extractkw.get_keywords(row[1])
         print "keywords is", keywords
         try:
-            m_k1 = keywords[0]
+            m_k1 = keywords[0].decode('utf-8','ignore')
         except IndexError,e:
             m_k1=""
         try:
-            m_k2 = keywords[1]
+            m_k2 = keywords[1].decode('utf-8','ignore')
         except IndexError,e:
             m_k2 =  ""
 

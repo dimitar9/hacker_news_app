@@ -1,7 +1,7 @@
 #!/bin/sh
- 
+rm news.20*
 curl http://api.ihackernews.com/page > news
-curl http://api.ihackernews.com/new > new_news
+#curl http://api.ihackernews.com/new > news
 curl http://hnify.herokuapp.com/get/newest > hnify_news_newest
 filename="news"
 echo $filename 
@@ -11,4 +11,4 @@ newfilename="$filename.$current_time"
 echo $newfilename
 cp $filename $newfilename
  
-echo "You should see new file generated with timestamp on it.."
+echo "news scrapper run sucessful"
