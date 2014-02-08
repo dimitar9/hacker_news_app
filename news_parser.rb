@@ -4,7 +4,10 @@ require "json"
 #curl http://api.ihackernews.com/new
 class NewsParser
 	def getParsedLatestPage
-		file = File.open("news","rb")
+		files = Dir['news.20*']
+		files.sort.reverse
+		filename = files[0]
+		file = File.open(filename,"rb")
 		contents = file.read
 
 

@@ -1,71 +1,79 @@
 import nltk
-
-text = "The Stupidity of Computers"
-
-# Used when tokenizing words
-sentence_re = r'''(?x)      # set flag to allow verbose regexps
-      ([A-Z])(\.[A-Z])+\.?  # abbreviations, e.g. U.S.A.
-    | \w+(-\w+)*            # words with optional internal hyphens
-    | \$?\d+(\.\d+)?%?      # currency and percentages, e.g. $12.40, 82%
-    | \.\.\.                # ellipsis
-    | [][.,;"'?():-_`]      # these are separate tokens
-'''
-
-lemmatizer = nltk.WordNetLemmatizer()
-stemmer = nltk.stem.porter.PorterStemmer()
-
-#Taken from Su Nam Kim Paper...
-grammar = r"""
-    NBAR:
-        {<NN.*|JJ>*<NN.*>}  # Nouns and Adjectives, terminated with Nouns
-        
-    NP:
-        {<NBAR>}
-        {<NBAR><IN><NBAR>}  # Above, connected with in/of/etc...
-"""
-chunker = nltk.RegexpParser(grammar)
-
-toks = nltk.regexp_tokenize(text, sentence_re)
-postoks = nltk.tag.pos_tag(toks)
-
-print postoks
-
-tree = chunker.parse(postoks)
-
 from nltk.corpus import stopwords
-stopwords = stopwords.words('english')
+
+class ExtractKW(object):
+    def __init__(self):
+        self.classname = "ExtractKW"
 
 
-def leaves(tree):
-    """Finds NP (nounphrase) leaf nodes of a chunk tree."""
-    for subtree in tree.subtrees(filter = lambda t: t.node=='NP'):
-        yield subtree.leaves()
+        # Used when tokenizing words
+        self.sentence_re = r'''(?x)      # set flag to allow verbose regexps
+            ([A-Z])(\.[A-Z])+\.?  # abbreviations, e.g. U.S.A.
+            | \w+(-\w+)*            # words with optional internal hyphens
+            | \$?\d+(\.\d+)?%?      # currency and percentages, e.g. $12.40, 82%
+            | \.\.\.                # ellipsis
+            | [][.,;"'?():-_`]      # these are separate tokens
+        '''
 
-def normalise(word):
-    """Normalises words to lowercase and stems and lemmatizes it."""
-    word = word.lower()
-    word = stemmer.stem_word(word)
-    word = lemmatizer.lemmatize(word)
-    return word
+        self.lemmatizer = nltk.WordNetLemmatizer()
+        self.stemmer = nltk.stem.porter.PorterStemmer()
 
-def acceptable_word(word):
-    """Checks conditions for acceptable word: length, stopword."""
-    accepted = bool(2 <= len(word) <= 40
-        and word.lower() not in stopwords)
-    return accepted
+        #Taken from Su Nam Kim Paper...
+        grammar = r"""
+            NBAR:
+                {<NN.*|JJ>*<NN.*>}  # Nouns and Adjectives, terminated with Nouns
+            
+            NP:
+                {<NBAR>}
+                {<NBAR><IN><NBAR>}  # Above, connected with in/of/etc...
+        """
+        self.chunker = nltk.RegexpParser(grammar)
 
 
-def get_terms(tree):
-    for leaf in leaves(tree):
-        term = [ normalise(w) for w,t in leaf if acceptable_word(w) ]
-        yield term
+    def leaves(self,tree):
+        """Finds NP (nounphrase) leaf nodes of a chunk tree."""
+        for subtree in tree.subtrees(filter = lambda t: t.node=='NP'):
+            yield subtree.leaves()
 
-terms = get_terms(tree)
-result_list = []
-for term in terms:
-    for word in term:
-        print word
-        result_list.append(word)
+    def normalise(self,word):
+        """Normalises words to lowercase and stems and lemmatizes it."""
+        word = word.lower()
+        word = self.stemmer.stem_word(word)
+        word = self.lemmatizer.lemmatize(word)
+        return word
 
-print result_list[0]
-print result_list[1]
+    def acceptable_word(self,word):
+        """Checks conditions for acceptable word: length, stopword."""
+        accepted = bool(2 <= len(word) <= 40
+            and word.lower() not in stopwords.words('english'))
+        return accepted
+
+
+    def get_terms(self,tree):
+        for leaf in self.leaves(tree):
+            term = [ self.normalise(w) for w,t in leaf if self.acceptable_word(w) ]
+            yield term
+
+    def get_keywords(self,text):
+        
+
+
+        toks = nltk.regexp_tokenize(text, self.sentence_re)
+        postoks = nltk.tag.pos_tag(toks)
+
+        print postoks
+
+        tree = self.chunker.parse(postoks)
+        
+        
+        terms = self.get_terms(tree)
+        result_list = []
+        for term in terms:
+            for word in term:
+                print word
+                result_list.append(word)
+
+        print result_list
+        return(result_list)
+
+    
