@@ -3,7 +3,8 @@ require 'pg'
 require "rubygems"
 require "json"
 require "./news_parser.rb"
-
+require "./get_domain.rb"
+require ('uri')
 class PostgresDirect
   # Create the connection instance.
   def connect
@@ -81,6 +82,13 @@ class PostgresDirect
     @conn.close
   end
 end
+def get_host_without_www(url)
+  url.gsub!(/^\/comments/, "http://comments/")
+  uri = URI.parse(url)
+  uri = URI.parse("http://#{url}") if uri.scheme.nil?
+  host = uri.host.downcase
+  host.start_with?('www.') ? host[4..-1] : host
+end
 
 def main
   p = PostgresDirect.new()
@@ -89,14 +97,18 @@ def main
     p.createNewsLibTable
     p.prepareInsertNewsStatement
     np = NewsParser.new()
+    dm = Domain.new()
     news_json = np.getParsedLatestPage
 
 
     news_json["items"].each do |item|
       p.addNews(item["id"], item["title"].encode('utf-8'),item["url"],
-        item["points"], item["postedBy"],"","","",0, FALSE,Time.now.getutc)
+        item["points"], item["postedBy"],get_host_without_www(item["url"]),"","",0, FALSE,Time.now.getutc)
     end
-    p.queryNewsTable {|row| printf("id:%d title:%s submitter:%s\n", row['id'], row['title'],row['submitter'])}
+    p.queryNewsTable {|row| 
+      printf("id:%d title:%s submitter:%s\n", row['id'], row['title'],row['submitter'])
+    }
+    
   rescue Exception => e
     puts e.message
     puts e.backtrace.inspect
