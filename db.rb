@@ -2,9 +2,10 @@ require 'pg'
 # parse scrapped hacker news JSON file.
 require "rubygems"
 require "json"
-require "./news_parser.rb"
-require "./get_domain.rb"
+require "/home/paul/Documents/linuxwork/hackerNewsApp/news_parser.rb"
+require "/home/paul/Documents/linuxwork/hackerNewsApp/get_domain.rb"
 require ('uri')
+require ('logger')
 class PostgresDirect
   # Create the connection instance.
   def connect
@@ -91,8 +92,16 @@ def get_host_without_www(url)
 end
 
 def main
+  file = File.open('/home/paul/Documents/linuxwork/hackerNewsApp/rubylog.log', File::WRONLY | File::APPEND)
+  logger = Logger.new(file)
+
+
+
+  logger.debug("ruby db.rb in main.\n")
   p = PostgresDirect.new()
+  logger.error("ruby db.rb after new.\n")
   p.connect
+  logger.debug("ruby db.rb after connect.\n")
   begin
     p.createNewsLibTable
     p.prepareInsertNewsStatement
@@ -115,6 +124,8 @@ def main
   ensure
     p.disconnect
   end
+  logger.debug("ruby db.rb finished.\n")
+  logger.close
 end
 
 

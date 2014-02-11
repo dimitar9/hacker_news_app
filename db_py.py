@@ -1,9 +1,10 @@
 import psycopg2
 import sys 
 import mytest_nltk
-
+import datetime
 # start to retrieve data from database
 con = None
+
 
 try:
      
@@ -41,3 +42,7 @@ finally:
     
     if con:
         con.close()
+    with open('/home/paul/Documents/linuxwork/hackerNewsApp/log.txt','a') as outf:
+        outf.write('%s:db_py run successfully!\n' % datetime.datetime.now().strftime("%I:%M%p-%B %d, %Y"))
+
+
