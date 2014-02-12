@@ -7,7 +7,6 @@ require "/home/paul/Documents/linuxwork/hackerNewsApp/news_parser.rb"
 require "/home/paul/Documents/linuxwork/hackerNewsApp/get_domain.rb"
 require ('uri')
 require ('logger')
-
 class PostgresDirect
   Liked = 2
   Noliked = -2
@@ -122,8 +121,8 @@ end
       num_all_judged = num_liked + num_noliked + num_dontcare
       m_prob_liked =num_liked/num_all_judged
       m_prob_noliked = num_noliked/num_all_judged
-      m_prob_dontcake = num_dontcare/num_all_judged
-      puts ( "m_prob_liked: #{m_prob_liked} m_prob_noliked : #{m_prob_noliked},m_prob_dontcake is #{m_prob_dontcake} ") 
+      m_prob_dontcare = num_dontcare/num_all_judged
+      puts ( "m_prob_liked: #{m_prob_liked} m_prob_noliked : #{m_prob_noliked},m_prob_dontcare is #{m_prob_dontcare} ") 
       
       p.queryNewsTable { |row| 
         logger.debug("ruby trainer.rb in query !after #{__LINE__}.\n" )
@@ -150,7 +149,7 @@ end
       logger.debug("ruby trainer.rb after #{__LINE__}.\n" )
       dontcare_keyword_hash.keys.each do |key|
         val = dontcare_keyword_hash[key] 
-        dontcare_keyword_prob_hash[key] = val / m_prob_dontcake
+        dontcare_keyword_prob_hash[key] = val / m_prob_dontcare
            
       end
       logger.debug("ruby trainer.rb after #{__LINE__}.\n" )
@@ -174,8 +173,29 @@ end
         val = dontcare_keyword_prob_hash[key] 
         puts key + ': ' + val.to_s
       end
+      p.queryNewsTable { |row| 
+        puts row['judged']
+       
+        if(true)#(row['judged'] == 'f')
+          puts row['title'] 
 
-    
+          test_like_problog =((liked_keyword_prob_hash[row['keyword1']]) +
+            (liked_keyword_prob_hash[row['keyword2']]) )
+            
+          puts test_like_problog
+          
+          test_nolike_problog =((noliked_keyword_prob_hash[row['keyword1']] )+
+            (noliked_keyword_prob_hash[row['keyword2']])  )
+           
+          puts test_nolike_problog
+
+          test_dontcare_problog =((dontcare_keyword_prob_hash[row['keyword1']]) +
+            (dontcare_keyword_prob_hash[row['keyword2']]) )
+          puts test_dontcare_problog
+
+        end
+      }
+
 
     rescue Exception => e
       puts e.message
