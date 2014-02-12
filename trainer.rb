@@ -1,11 +1,15 @@
+#bayes trainer
+module trainer
 require 'pg'
-# parse scrapped hacker news JSON file.
 require "rubygems"
 require "json"
 require "/home/paul/Documents/linuxwork/hackerNewsApp/news_parser.rb"
 require "/home/paul/Documents/linuxwork/hackerNewsApp/get_domain.rb"
 require ('uri')
 require ('logger')
+LIKED   =2
+NOLIKED =-2
+DONTCARE=1
 class PostgresDirect
   # Create the connection instance.
   def connect
@@ -45,6 +49,25 @@ class PostgresDirect
   end
 end
 
+#likeCatetory: LIKED, NOLIKED,DONTCARE
+def getCategoryArticleNum(likeCategory)
+  sum = 0
+  p.queryNewsTable {|row| 
+  if(row['likeness'] == likeCategory)
+    sum += 1
+  end
+  return sum
+end
+
+def getCategoryKeywordCount(likeCategory, keyword)
+  sum = 0
+  p.queryNewsTable {|row| 
+  if((row['likeness'] == likeCategory) and ((row['keword1'] == keyword) or(row['keword2'] == keyword)) )
+    sum += 1
+  end
+  return sum
+end
+
 
 def main
   file = File.open('/home/paul/Documents/linuxwork/hackerNewsApp/rubylog.log', File::WRONLY | File::APPEND)
@@ -52,11 +75,11 @@ def main
 
 
 
-  logger.debug("ruby judge.rb in main.\n")
+  logger.debug("ruby trainer.rb in main.\n")
   p = PostgresDirect.new()
-  logger.error("ruby judge.rb after new.\n")
+  logger.error("ruby trainer.rb after new.\n")
   p.connect
-  logger.debug("ruby judge.rb after connect.\n")
+  logger.debug("ruby trainer.rb after connect.\n")
   begin
   
     p.prepareUpdateNewsStatement
@@ -93,9 +116,10 @@ def main
   ensure
     p.disconnect
   end
-  logger.debug("ruby judge.rb finished.\n")
+  logger.debug("ruby trainer.rb finished.\n")
   logger.close
 end
 
 
 main
+end
