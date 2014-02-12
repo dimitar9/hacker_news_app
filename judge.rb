@@ -6,6 +6,7 @@ require "/home/paul/Documents/linuxwork/hackerNewsApp/news_parser.rb"
 require "/home/paul/Documents/linuxwork/hackerNewsApp/get_domain.rb"
 require ('uri')
 require ('logger')
+
 class PostgresDirect
   # Create the connection instance.
   def connect
