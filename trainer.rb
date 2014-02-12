@@ -56,27 +56,6 @@ class PostgresDirect
     @conn.close
   end
 
-
-
-
-  def getCategoryKeywordCount(likeCategory, keyword)
-=begin
-    sum = 0
-    queryNewsTable {|row| 
-    if((row['likeness'] == likeCategory) and ((row['keword1'] == keyword) or(row['keword2'] == keyword)) )
-      sum += 1
-    end
-    } 
-=end
-    if (keyword == '')
-      return 0
-    else
-      return 5.0
-    end
-  end
-
-
-
   def incr_liked_keyword_hashvalue(row,keyword_hash)
     if (row['keyword1'] != nil)
       keyword_hash[row['keyword1']] += 1
@@ -144,7 +123,7 @@ end
       m_prob_liked =num_liked/num_all_judged
       m_prob_noliked = num_noliked/num_all_judged
       m_prob_dontcake = num_dontcare/num_all_judged
-
+      puts ( "m_prob_liked: #{m_prob_liked} m_prob_noliked : #{m_prob_noliked},m_prob_dontcake is #{m_prob_dontcake} ") 
       
       p.queryNewsTable { |row| 
         logger.debug("ruby trainer.rb in query !after #{__LINE__}.\n" )
@@ -161,10 +140,8 @@ end
       liked_keyword_hash.keys.each do |key|
         val = liked_keyword_hash[key]
         liked_keyword_prob_hash[key] = val / m_prob_liked
-        logger.debug("ruby trainer.rb liked training after #{__LINE__}.\n" )
-           
       end
-      logger.debug("ruby trainer.rb after #{__LINE__}.\n" )
+      
       noliked_keyword_hash.keys.each do |key|
         val = noliked_keyword_hash[key]
         noliked_keyword_prob_hash[key] = val / m_prob_noliked
@@ -182,9 +159,23 @@ end
       liked_keyword_prob_hash.keys.each do |key|
         val = liked_keyword_prob_hash[key] 
         puts key + ': ' + val.to_s
-     
       end
-      logger.debug("ruby trainer.rb after #{__LINE__}.\n" )
+
+      puts "\n"
+      noliked_keyword_prob_hash.delete_if {|key, value| key == nil }  
+      noliked_keyword_prob_hash.keys.each do |key|
+        val = noliked_keyword_prob_hash[key] 
+        puts key + ': ' + val.to_s
+      end
+
+      puts "\n"
+      dontcare_keyword_prob_hash.delete_if {|key, value| key == nil }  
+      dontcare_keyword_prob_hash.keys.each do |key|
+        val = dontcare_keyword_prob_hash[key] 
+        puts key + ': ' + val.to_s
+      end
+
+    
 
     rescue Exception => e
       puts e.message
@@ -196,5 +187,5 @@ end
     logger.close
   end
 
-
+#id 7216070
 main
