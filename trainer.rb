@@ -57,16 +57,6 @@ class PostgresDirect
   end
 
 
-  #likeCatetory: LIKED, NOLIKED,DONTCARE
-  def getCategoryArticleNum(likeCategory)
-    #sum = 0
-    #queryNewsTable {  |row|  
-    #if (row['likeness'] == likeCategory)
-     # sum += 1
-    #end
-    #}
-    return 100.0
-  end
 
 
   def getCategoryKeywordCount(likeCategory, keyword)
@@ -85,17 +75,7 @@ class PostgresDirect
     end
   end
 
-  def getProbLiked
-    return ( getCategoryArticleNum(Liked) / (getCategoryArticleNum(Liked) + getCategoryArticleNum(Noliked) + getCategoryArticleNum(Dontcare)))
-  end
 
-  def getProbNoLiked
-    return (getCategoryArticleNum(Noliked) / (getCategoryArticleNum(Liked) + getCategoryArticleNum(Noliked) + getCategoryArticleNum(Dontcare)))
-  end
-
-  def getProbDontcare
-    return (getCategoryArticleNum(Dontcare) / (getCategoryArticleNum(Liked) + getCategoryArticleNum(Noliked) + getCategoryArticleNum(Dontcare)))
-  end
 
   def incr_liked_keyword_hashvalue(row,keyword_hash)
     if (row['keyword1'] != nil)
@@ -138,9 +118,6 @@ end
     dontcare_keyword_prob_hash = Hash.new(0)
     file = File.open('/home/paul/Documents/linuxwork/hackerNewsApp/rubylog.log', File::WRONLY | File::APPEND)
     logger = Logger.new(file)
-    m_prob_liked = p.getProbLiked
-    m_prob_noliked = p.getProbNoLiked
-    m_prob_dontcake = p.getProbDontcare
 
 
     logger.debug("ruby trainer.rb in main.\n")
@@ -151,8 +128,23 @@ end
     begin
     
       p.prepareUpdateNewsStatement
+      num_liked=0.0
+      num_noliked=0.0
+      num_dontcare = 0.0
+      p.queryNewsTable { |row| 
+        if (row['likeness'] == '2')
+          num_liked =1+num_liked
+        elsif (row['likeness'] == '-2')
+          num_noliked=1+num_noliked
+        elsif (row['likeness'] == '1')
+          num_dontcare=1+num_dontcare
+        end
+      }
+      num_all_judged = num_liked + num_noliked + num_dontcare
+      m_prob_liked =num_liked/num_all_judged
+      m_prob_noliked = num_noliked/num_all_judged
+      m_prob_dontcake = num_dontcare/num_all_judged
 
-   
       
       p.queryNewsTable { |row| 
         logger.debug("ruby trainer.rb in query !after #{__LINE__}.\n" )
