@@ -107,8 +107,11 @@ def main
     p.prepareInsertNewsStatement
     np = NewsParser.new()
     dm = Domain.new()
-    news_json = np.getParsedLatestPage
-
+    news_json=[]
+    files = Dir['/home/paul/Documents/linuxwork/hackerNewsApp/news.20*']
+    files.each { |x| 
+    news_json = np.getParsedLatestPage(x)
+  }
 
     news_json["items"].each do |item|
       p.addNews(item["id"], item["title"].encode('utf-8'),item["url"],

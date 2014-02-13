@@ -1,5 +1,5 @@
 #!/bin/sh
-rm -f /home/paul/Documents/linuxwork/hackerNewsApp/news.20*
+#rm -f /home/paul/Documents/linuxwork/hackerNewsApp/news.20*
 rm -f /home/paul/Documents/linuxwork/hackerNewsApp/news
 curl http://api.ihackernews.com/page > /home/paul/Documents/linuxwork/hackerNewsApp/news
 #curl http://api.ihackernews.com/new > /home/paul/Documents/linuxwork/hackerNewsApp/news 
